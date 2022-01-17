@@ -8,6 +8,7 @@ class CFG:
     def init_variables(self):
         for i in range(65, 91):
             self.unused_variables.append(chr(i))
+        self.unused_variables.append('S0')
 
     def add_rule(self, variable, rhs):
         if variable in self.rules:
@@ -15,17 +16,3 @@ class CFG:
         else:
             self.unused_variables.remove(variable)
             self.rules[variable] = [rhs]
-
-
-# S -> ASB
-# A -> aAS|a|ε
-# B -> SbS|A|bb
-cfg = CFG()
-cfg.add_rule('S', 'ASB')
-cfg.add_rule('A', 'aAS')
-cfg.add_rule('A', 'a')
-cfg.add_rule('A', '')
-cfg.add_rule('B', 'SbS')
-cfg.add_rule('B', 'A')
-cfg.add_rule('B', 'bb')
-print(cfg.rules)
