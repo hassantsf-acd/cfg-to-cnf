@@ -38,22 +38,27 @@ def remove_unit_productions(cfg):
         unit_productions = find_unit_productions(cfg)
 
 
-# S -> ASB
-# A -> aAS|a|ε
-# B -> SbS|A|bb
-cfg = CFG()
-cfg.add_rule('S', 'ASB')
-cfg.add_rule('A', 'aAS')
-cfg.add_rule('A', 'a')
-cfg.add_rule('A', 'B')
-# cfg.add_rule('A', '')
-cfg.add_rule('B', 'SbS')
-cfg.add_rule('B', 'A')
-cfg.add_rule('B', 'bb')
-print(cfg.rules)
+def main():
+    # S -> ASB
+    # A -> aAS|a|ε
+    # B -> SbS|A|bb
+    cfg = CFG()
+    cfg.add_rule('S', 'ASB')
+    cfg.add_rule('A', 'aAS')
+    cfg.add_rule('A', 'a')
+    cfg.add_rule('A', 'B')
+    # cfg.add_rule('A', '')
+    cfg.add_rule('B', 'SbS')
+    cfg.add_rule('B', 'A')
+    cfg.add_rule('B', 'bb')
+    print(cfg.rules)
 
-eliminate_start_variable(cfg)
-print(cfg.rules)
+    eliminate_start_variable(cfg)
+    print(cfg.rules)
 
-remove_unit_productions(cfg)
-print(cfg.rules)
+    remove_unit_productions(cfg)
+    print(cfg.rules)
+
+
+if __name__ == "__main__":
+    main()
