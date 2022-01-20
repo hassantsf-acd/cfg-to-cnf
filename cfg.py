@@ -25,3 +25,6 @@ class CFG:
 
     def extend_rule(self, src, dest):
         self.rules[src] = self.rules[src].union(self.rules[dest])
+
+    def get_unvisited_variable(self):
+        return list(self.unused_variables)[len(self.unused_variables) - 1]

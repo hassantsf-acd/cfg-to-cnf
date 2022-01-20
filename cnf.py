@@ -38,6 +38,18 @@ def remove_unit_productions(cfg):
         unit_productions = find_unit_productions(cfg)
 
 
+def remove_long_rhs(cfg):
+    for rule in cfg.rules.copy():
+        for rhs in cfg.rules[rule]:
+            side = rhs
+            while len(side) > 2:
+                new_variable = cfg.get_unvisited_variable()
+                cfg.add_rule(new_variable, side[:2])
+                cfg.rules[rule].remove(side)
+                side = new_variable + side[2:]
+                cfg.rules[rule].add(side)
+
+
 def main():
     # S -> ASB
     # A -> aAS|a|ε
@@ -54,6 +66,9 @@ def main():
     print(cfg.rules)
 
     eliminate_start_variable(cfg)
+    print(cfg.rules)
+
+    remove_long_rhs(cfg)
     print(cfg.rules)
 
     remove_unit_productions(cfg)
