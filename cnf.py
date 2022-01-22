@@ -1,5 +1,5 @@
 from cfg import CFG
-
+from string import ascii_lowercase, ascii_uppercase
 
 def start_in_rhs(cfg):
     for variable in cfg.rules:
@@ -37,6 +37,81 @@ def remove_unit_productions(cfg):
                 cfg.extend_rule(unit[0], unit[1])
         unit_productions = find_unit_productions(cfg)
 
+set_of_elements_without_specified_char = set()
+
+def create_subset_of_rules(string, element, no):
+    global set_of_elements_without_specified_char
+    try:
+        string[no]
+    except Exception:
+        return
+    if string[no] == element:
+        without_element = string[:no] + string[no + 1:]
+        with_element = string
+        set_of_elements_without_specified_char.update([with_element, without_element])
+        create_subset_of_rules(without_element, element, no)
+        create_subset_of_rules(with_element, element, no + 1)
+    else:
+        create_subset_of_rules(string, element, no + 1)
+
+def find_null_productions(cfg):
+    null_producers = []
+    for variable, rule in cfg.rules.items():
+        if '' in rule:
+            null_producers.append(variable)
+            cfg.remove_variable(variable, '')
+    return null_producers
+
+def remove_null_productions(cfg):
+    global set_of_elements_without_specified_char
+    null_producers = find_null_productions(cfg)
+
+    while null_producers:
+        for variable, rule in cfg.rules.copy().items():
+            adding_rules = set()
+            for element in rule:
+                for producer in null_producers:
+                    if producer in element:
+                        set_of_elements_without_specified_char = set()
+                        create_subset_of_rules(element, producer, 0)
+                        adding_rules.update(set_of_elements_without_specified_char)
+            cfg.add_rule(variable, adding_rules)
+        null_producers = find_null_productions(cfg)
+
+def find_terminals_in_rule(cfg, rule):
+    terminals = set()
+    has_terminal, has_non_terminal = False, False
+    for char in rule:
+        if char in ascii_lowercase:
+            has_terminal = True
+            terminals.add(char)
+        if char in cfg.rules.keys():
+            has_non_terminal = True
+    if has_terminal and has_non_terminal:
+        return terminals
+
+
+def remove_terminals_neighbourhood(cfg):
+    cfg_terminals = set()
+    for variable, rule in cfg.rules.copy().items():
+        for element in rule:
+            if terminals := find_terminals_in_rule(cfg, element):
+                cfg_terminals |= terminals
+
+    adding_rules = {}
+    for terminal in cfg_terminals:
+        new_variable = cfg.get_unvisited_variable()
+        cfg.add_rule(new_variable, terminal)
+        adding_rules[terminal] = new_variable
+
+
+    for variable, rule in cfg.rules.copy().items():
+        for element in rule:
+            if terminals := find_terminals_in_rule(cfg, element):
+                map_table = element.maketrans(adding_rules)
+                replaced_rule = element.translate(map_table)
+                cfg.remove_variable(variable, element)
+                cfg.add_rule(variable, replaced_rule)
 
 def remove_long_rhs(cfg):
     for rule in cfg.rules.copy():
@@ -59,20 +134,20 @@ def main():
     cfg.add_rule('A', 'aAS')
     cfg.add_rule('A', 'a')
     cfg.add_rule('A', 'B')
-    # cfg.add_rule('A', '')
+    cfg.add_rule('A', '')
     cfg.add_rule('B', 'SbS')
     cfg.add_rule('B', 'A')
     cfg.add_rule('B', 'bb')
-    print(cfg.rules)
 
     eliminate_start_variable(cfg)
-    print(cfg.rules)
-
     remove_long_rhs(cfg)
-    print(cfg.rules)
-
     remove_unit_productions(cfg)
-    print(cfg.rules)
+    remove_null_productions(cfg)
+    remove_terminals_neighbourhood(cfg)
+
+    print(cfg)
+
+
 
 
 if __name__ == "__main__":

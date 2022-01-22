@@ -14,11 +14,14 @@ class CFG:
         self.unused_variables.add('S0')
 
     def add_rule(self, variable, rhs):
-        if variable in self.rules:
-            self.rules[variable].add(rhs)
+        if isinstance(rhs, set):
+            self.rules[variable].update(rhs)
         else:
-            self.unused_variables.remove(variable)
-            self.rules[variable] = {rhs}
+            if variable in self.rules:
+                self.rules[variable].add(rhs)
+            else:
+                self.unused_variables.remove(variable)
+                self.rules[variable] = {rhs}
 
     def remove_variable(self, variable, rhs):
         self.rules[variable].remove(rhs)
@@ -28,3 +31,9 @@ class CFG:
 
     def get_unvisited_variable(self):
         return list(self.unused_variables)[len(self.unused_variables) - 1]
+
+    def __str__(self):
+        string = ""
+        for variable, rhs in self.rules.items():
+            string += f'{variable} -> {list(rhs)}\n'
+        return string
