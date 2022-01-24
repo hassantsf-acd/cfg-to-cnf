@@ -1,5 +1,6 @@
 from cfg import CFG
 from string import ascii_lowercase, ascii_uppercase
+from copy import deepcopy
 
 def start_in_rhs(cfg):
     for variable in cfg.rules:
@@ -130,25 +131,33 @@ def main():
     # A -> aAS|a|ε
     # B -> SbS|A|bb
     cfg = CFG()
-    cfg.add_rule('S', 'ASB')
-    cfg.add_rule('A', 'aAS')
-    cfg.add_rule('A', 'a')
-    cfg.add_rule('A', 'B')
-    cfg.add_rule('A', '')
-    cfg.add_rule('B', 'SbS')
-    cfg.add_rule('B', 'A')
-    cfg.add_rule('B', 'bb')
+    # cfg.add_rule('S', 'ASB')
+    # cfg.add_rule('A', 'aAS')
+    # cfg.add_rule('A', 'a')
+    # cfg.add_rule('A', 'B')
+    # cfg.add_rule('A', '')
+    # cfg.add_rule('B', 'SbS')
+    # cfg.add_rule('B', 'A')
+    # cfg.add_rule('B', 'bb')
 
-    eliminate_start_variable(cfg)
-    remove_long_rhs(cfg)
-    remove_unit_productions(cfg)
-    remove_null_productions(cfg)
-    remove_terminals_neighbourhood(cfg)
+    cfg.add_rule('S', 'ASA')
+    cfg.add_rule('S', 'oB')
+    cfg.add_rule('A', 'B')
+    cfg.add_rule('A', 'S')
+    cfg.add_rule('B', 'b')
+    cfg.add_rule('B', '')
+
+    last_cfg = None
+
+    while last_cfg != cfg:
+        last_cfg = deepcopy(cfg)
+        eliminate_start_variable(cfg)
+        remove_long_rhs(cfg)
+        remove_unit_productions(cfg)
+        remove_null_productions(cfg)
+        remove_terminals_neighbourhood(cfg)
 
     print(cfg)
-
-
-
 
 if __name__ == "__main__":
     main()

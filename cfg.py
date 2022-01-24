@@ -37,3 +37,15 @@ class CFG:
         for variable, rhs in self.rules.items():
             string += f'{variable} -> {list(rhs)}\n'
         return string
+
+    def __eq__(self, other):
+        is_equal = True
+        if other is None:
+            return False
+        if self.variables != other.variables:
+            is_equal = False
+        if self.rules != other.rules:
+            is_equal = False
+        if self.unused_variables != other.unused_variables:
+            is_equal = False
+        return is_equal
