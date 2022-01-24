@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 class CFG:
     def __init__(self, start_variable='S', rules=None):
         if rules is None:
@@ -34,8 +36,10 @@ class CFG:
 
     def __str__(self):
         string = ""
-        for variable, rhs in self.rules.items():
-            string += f'{variable} -> {list(rhs)}\n'
+        orders = OrderedDict(self.rules)
+        sorted(orders, key=lambda x: len(self.rules[x]), reverse=True)
+        for variable, rhs in orders.items():
+            string += f'{variable} -> ' + ' | '.join(list(rhs)) + '\n'
         return string
 
     def __eq__(self, other):

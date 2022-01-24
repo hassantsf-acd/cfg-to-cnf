@@ -125,6 +125,18 @@ def remove_long_rhs(cfg):
                 side = new_variable + side[2:]
                 cfg.rules[rule].add(side)
 
+def apply_rules(cfg):
+    last_cfg = None
+
+    while last_cfg != cfg:
+        last_cfg = deepcopy(cfg)
+        eliminate_start_variable(cfg)
+        remove_long_rhs(cfg)
+        remove_unit_productions(cfg)
+        remove_null_productions(cfg)
+        remove_terminals_neighbourhood(cfg)
+
+    return cfg
 
 def main():
     # S -> ASB
@@ -142,6 +154,7 @@ def main():
 
     cfg.add_rule('S', 'ASA')
     cfg.add_rule('S', 'oB')
+    cfg.add_rule('S', 'A')
     cfg.add_rule('A', 'B')
     cfg.add_rule('A', 'S')
     cfg.add_rule('B', 'b')
