@@ -91,24 +91,39 @@ def find_terminals_in_rule(cfg, rule):
     if has_terminal and has_non_terminal:
         return terminals
 
+def find_two_more_terminals(rule):
+    terminals = set()
+    if len(rule) <= 1:
+        return None
+    for char in rule:
+        if char not in ascii_lowercase and char != '':
+            return None
+        terminals.add(char)
+    return terminals
+
+
 
 def remove_terminals_neighbourhood(cfg):
     cfg_terminals = set()
     for variable, rule in cfg.rules.copy().items():
         for element in rule:
-            if terminals := find_terminals_in_rule(cfg, element):
-                cfg_terminals |= terminals
+            if terminals1 := find_terminals_in_rule(cfg, element):
+                cfg_terminals |= terminals1
+            if terminals2 := find_two_more_terminals(element):
+                cfg_terminals |= terminals2
 
     adding_rules = {}
     for terminal in cfg_terminals:
         new_variable = cfg.get_unvisited_variable()
         cfg.add_rule(new_variable, terminal)
+        print(new_variable, terminal)
         adding_rules[terminal] = new_variable
 
 
     for variable, rule in cfg.rules.copy().items():
         for element in rule:
-            if terminals := find_terminals_in_rule(cfg, element):
+            if find_terminals_in_rule(cfg, element) or \
+             find_two_more_terminals(element):
                 map_table = element.maketrans(adding_rules)
                 replaced_rule = element.translate(map_table)
                 cfg.remove_variable(variable, element)
@@ -166,8 +181,8 @@ def main():
         last_cfg = deepcopy(cfg)
         eliminate_start_variable(cfg)
         remove_long_rhs(cfg)
-        remove_unit_productions(cfg)
         remove_null_productions(cfg)
+        remove_unit_productions(cfg)
         remove_terminals_neighbourhood(cfg)
 
     print(cfg)
