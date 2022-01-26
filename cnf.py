@@ -42,9 +42,7 @@ set_of_elements_without_specified_char = set()
 
 def create_subset_of_rules(string, element, no):
     global set_of_elements_without_specified_char
-    try:
-        string[no]
-    except Exception:
+    if no >= len(string):
         return
     if string[no] == element:
         without_element = string[:no] + string[no + 1:]
@@ -112,19 +110,19 @@ def remove_terminals_neighbourhood(cfg):
             if terminals2 := find_two_more_terminals(element):
                 cfg_terminals |= terminals2
 
-    adding_rules = {}
+    unary_rules = {}
     for terminal in cfg_terminals:
         new_variable = cfg.get_unvisited_variable()
         cfg.add_rule(new_variable, terminal)
         print(new_variable, terminal)
-        adding_rules[terminal] = new_variable
+        unary_rules[terminal] = new_variable
 
 
     for variable, rule in cfg.rules.copy().items():
         for element in rule:
             if find_terminals_in_rule(cfg, element) or \
              find_two_more_terminals(element):
-                map_table = element.maketrans(adding_rules)
+                map_table = element.maketrans(unary_rules)
                 replaced_rule = element.translate(map_table)
                 cfg.remove_variable(variable, element)
                 cfg.add_rule(variable, replaced_rule)
